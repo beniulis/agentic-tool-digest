@@ -3,6 +3,37 @@ import { ArrowRight, Zap, Database, Cpu } from "lucide-react";
 import heroImage from "@/assets/hero-bg.jpg";
 
 const HeroSection = () => {
+  const scrollToTools = () => {
+    const toolsSection = document.getElementById('tools-section');
+    if (toolsSection) {
+      const targetPosition = toolsSection.offsetTop - 80;
+      const startPosition = window.pageYOffset;
+      const distance = targetPosition - startPosition;
+      const duration = 1000; // 1 second duration
+      let start: number;
+
+      // Easing function for smooth animation
+      const easeInOutCubic = (t: number): number => {
+        return t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
+      };
+
+      const animation = (currentTime: number) => {
+        if (start === undefined) start = currentTime;
+        const timeElapsed = currentTime - start;
+        const progress = Math.min(timeElapsed / duration, 1);
+        const ease = easeInOutCubic(progress);
+        
+        window.scrollTo(0, startPosition + distance * ease);
+        
+        if (timeElapsed < duration) {
+          requestAnimationFrame(animation);
+        }
+      };
+      
+      requestAnimationFrame(animation);
+    }
+  };
+
   return (
     <section className="relative py-20 lg:py-32 overflow-hidden">
       {/* Background Image */}
@@ -37,7 +68,7 @@ const HeroSection = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-slide-up">
-            <Button size="lg" variant="secondary" className="text-lg px-8 py-3">
+            <Button size="lg" variant="secondary" className="text-lg px-8 py-3" onClick={scrollToTools}>
               Explore Tools
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>

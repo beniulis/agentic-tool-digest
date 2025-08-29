@@ -84,7 +84,7 @@ const ToolsSection = () => {
     : sampleTools.filter(tool => tool.category === activeCategory);
 
   return (
-    <section className="py-16 bg-muted/20">
+    <section id="tools-section" className="py-16 bg-muted/20">
       <div className="container mx-auto px-4 lg:px-8">
         {/* Section Header */}
         <div className="text-center space-y-4 mb-12">

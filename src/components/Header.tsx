@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { Search, Plus, Bell, Settings } from "lucide-react";
+import { Search, Plus, Bell, Settings, Info } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   return (
@@ -9,12 +10,12 @@ const Header = () => {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
+            <Link to="/" className="flex items-center space-x-2">
               <div className="w-8 h-8 gradient-primary rounded-lg flex items-center justify-center">
                 <span className="text-primary-foreground font-bold text-sm">AT</span>
               </div>
               <span className="text-xl font-bold">AgenticTools</span>
-            </div>
+            </Link>
           </div>
 
           {/* Search Bar */}
@@ -30,6 +31,11 @@ const Header = () => {
 
           {/* Actions */}
           <div className="flex items-center space-x-2">
+            <Link to="/about">
+              <Button variant="ghost" size="icon" title="About - SOAP to REST Migration Guide">
+                <Info className="h-4 w-4" />
+              </Button>
+            </Link>
             <Button variant="ghost" size="icon" className="hidden md:flex">
               <Bell className="h-4 w-4" />
             </Button>
