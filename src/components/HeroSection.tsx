@@ -1,10 +1,8 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
 import heroImage from "@/assets/hero-bg.jpg";
 
 const HeroSection = () => {
-  const navigate = useNavigate();
 
   const scrollToTools = () => {
     const toolsSection = document.getElementById('tools-section');
@@ -67,28 +65,6 @@ const HeroSection = () => {
             <p className="text-xl md:text-2xl text-primary-foreground/80 max-w-2xl mx-auto leading-relaxed">
               Discover, track, and leverage the latest AI-powered development tools that are transforming how we build software.
             </p>
-          </div>
-
-          {/* Featured Project Card */}
-          <div className="animate-slide-up">
-            <div className="bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-orange-500/20 backdrop-blur-sm border border-primary-foreground/20 rounded-2xl p-6 max-w-2xl mx-auto mb-6">
-              <div className="flex items-center gap-2 mb-3">
-                <Sparkles className="h-5 w-5 text-yellow-300" />
-                <span className="text-sm font-semibold text-primary-foreground/80 uppercase tracking-wide">Featured Project</span>
-              </div>
-              <h3 className="text-2xl font-bold text-primary-foreground mb-2">Migration Agent UI v1</h3>
-              <p className="text-primary-foreground/80 mb-4">
-                Comprehensive LLM-powered tooling suite for automating SOAP-to-REST migrations with multi-agent systems, batch processing, and visual analytics.
-              </p>
-              <Button
-                size="lg"
-                className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
-                onClick={() => navigate('/agents')}
-              >
-                Explore Migration Agent UI
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </div>
           </div>
 
           {/* CTA Buttons */}

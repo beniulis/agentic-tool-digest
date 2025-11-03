@@ -13,6 +13,7 @@ from pathlib import Path
 from datetime import datetime
 
 from agents.research_agent import ToolResearchAgent, ToolCuratorAgent
+from agents.openai_websearch_agent import OpenAIWebSearchAgent
 
 app = FastAPI(title="Agentic Tool Research API", version="1.0.0")
 
@@ -294,6 +295,55 @@ def get_research_logs():
         with open(RESEARCH_LOG_PATH, 'r', encoding='utf-8') as f:
             return json.load(f)
     return []
+
+
+# OpenAI WebSearch endpoints
+class WebSearchRequest(BaseModel):
+    query: str
+    max_results: Optional[int] = 10
+
+
+class TopicResearchRequest(BaseModel):
+    topic: str
+    aspects: Optional[List[str]] = None
+
+
+@app.post("/websearch/search")
+def openai_web_search(request: WebSearchRequest):
+    """
+    Perform web search using OpenAI's native web search tool
+
+    Example request:
+    {
+        "query": "latest AI coding assistants 2025",
+        "max_results": 10
+    }
+    """
+    try:
+        agent = OpenAIWebSearchAgent()
+        result = agent.search(query=request.query, max_results=request.max_results)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/websearch/research")
+def openai_research_topic(request: TopicResearchRequest):
+    """
+    Conduct comprehensive research on a topic using OpenAI's web search
+
+    Example request:
+    {
+        "topic": "Agentic coding tools",
+        "aspects": ["latest tools", "key features", "trends"]
+    }
+    """
+    try:
+        agent = OpenAIWebSearchAgent()
+        result = agent.research_topic(topic=request.topic, aspects=request.aspects)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 if __name__ == "__main__":

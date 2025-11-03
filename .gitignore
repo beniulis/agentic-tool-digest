@@ -18,6 +18,16 @@ dist-ssr
 .env.*.local
 backend/.env
 
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+backend/venv/
+backend/.venv/
+*.egg-info/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -28,3 +38,8 @@ backend/.env
 *.njsproj
 *.sln
 *.sw?
+
+# Archives and temporary files
+archive/
+*.bak
+*.tmp

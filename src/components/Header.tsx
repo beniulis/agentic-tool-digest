@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { Search, Plus, Bell, Settings, Info } from "lucide-react";
+import { Search, Plus, Bell, Settings } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Link } from "react-router-dom";
 
 const Header = () => {
   return (
@@ -10,20 +9,20 @@ const Header = () => {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center space-x-4">
-            <Link to="/" className="flex items-center space-x-2">
+            <a href="/" className="flex items-center space-x-2">
               <div className="w-8 h-8 gradient-primary rounded-lg flex items-center justify-center">
                 <span className="text-primary-foreground font-bold text-sm">AT</span>
               </div>
               <span className="text-xl font-bold">AgenticTools</span>
-            </Link>
+            </a>
           </div>
 
           {/* Search Bar */}
           <div className="hidden md:flex flex-1 max-w-md mx-8">
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <Input 
-                placeholder="Search agentic tools..." 
+              <Input
+                placeholder="Search agentic tools..."
                 className="pl-10 pr-4 w-full"
               />
             </div>
@@ -31,11 +30,6 @@ const Header = () => {
 
           {/* Actions */}
           <div className="flex items-center space-x-2">
-            <Link to="/about">
-              <Button variant="ghost" size="icon" title="About - SOAP to REST Migration Guide">
-                <Info className="h-4 w-4" />
-              </Button>
-            </Link>
             <Button variant="ghost" size="icon" className="hidden md:flex">
               <Bell className="h-4 w-4" />
             </Button>
