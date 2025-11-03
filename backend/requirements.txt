@@ -1,0 +1,13 @@
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+pydantic>=2.10.0
+openai>=1.50.0
+requests>=2.32.0
+beautifulsoup4>=4.12.0
+python-dotenv>=1.0.0
+
+# Web search providers (choose one or more)
+duckduckgo-search>=7.0.0  # Free, no API key required (recommended)
+# For other providers, uncomment and add API keys to .env:
+# google-api-python-client==2.108.0  # Requires GOOGLE_SEARCH_API_KEY
+# bing-search-api==0.1.0  # Requires BING_SEARCH_API_KEY

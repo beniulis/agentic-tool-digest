@@ -1,0 +1,105 @@
+
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  urlcolor=blue,
+  citecolor=blue
+}
+\title{Literature Review: Code Migration from Rule-Based Translators to LLM-Driven Methods}
+\author{}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Background and Motivation}
+Code migration---translating software from one programming language to another---is driven by language obsolescence, platform modernization, performance, maintainability, and interoperability. Traditional rule-based transpilers were designed to reduce manual rewrites of large codebases, but they demand extensive expertise and maintenance as languages evolve. High-profile migrations (e.g., large COBOL-to-Java efforts) illustrate the cost and complexity, motivating research into more flexible automation.
+
+\section{Rule-Based Code Migration}
+\textbf{Approach.} Early source-to-source translators rely on hand-crafted rewrite rules applied to the Abstract Syntax Tree (AST). Rules encode mappings between source and target constructs, yielding predictable, stable output when rules are correct.
+
+\textbf{Limitations.} (i) High development/maintenance cost and dual-language expertise; (ii) limited adaptability to new languages and semantics; (iii) difficulty handling ambiguity and context; (iv) often non-idiomatic output that requires manual cleanup.
+
+\section{Statistical and Early Neural Methods}
+\subsection{Statistical Machine Translation (SMT)}
+Inspired by natural-language MT, SMT treats code as token sequences and learns translation probabilities from parallel corpora. Scarce parallel code and weak semantic guarantees limited adoption for production migrations.
+
+\subsection{Unsupervised Neural Transcompilation}
+\textbf{TransCoder} (Meta AI, 2020) demonstrated that fully unsupervised neural translation trained on monolingual GitHub code (via cross-lingual pretraining, denoising, and back-translation) can outperform rule-based baselines at the function level across C++, Java, and Python. Despite strong results, training was computationally expensive and performance declined beyond function granularity.
+
+\section{LLM-Based Code Migration}
+Large Language Models (LLMs) pretrained on massive code+text corpora (e.g., GPT, LLaMA families) enable zero/few-shot translation across many language pairs.
+
+\subsection{Advantages}
+\begin{itemize}[noitemsep]
+  \item Broad language coverage and flexibility without bespoke rule sets.
+  \item Ability to propose idiomatic patterns in the target language and handle tricky constructs (e.g., generators, method overloading) by producing semantically equivalent code.
+  \item Automation with reduced developer effort for straightforward use cases.
+\end{itemize}
+
+\subsection{Limitations and Failure Modes}
+Empirical studies show raw LLM outputs can be inconsistent and error-prone:
+\begin{itemize}[noitemsep]
+  \item \textbf{Context/window limits:} Long files and multi-module projects exceed context, risking broken dependencies.
+  \item \textbf{Bug patterns:} Missing imports/definitions, incorrect loops/conditions, inserted or removed logic, wrong data types, brittle input parsing, and formatting mismatches.
+  \item \textbf{Semantic drift:} Code may compile yet deviate from source behavior.
+  \item \textbf{Unpredictability:} Nondeterministic outputs complicate testing and versioning.
+\end{itemize}
+A large-scale ICSE'24 study across five languages reported correct translations ranging roughly from 2\% to 47\% for general/code LLMs on diverse benchmarks, underscoring the need for additional guidance and verification.
+
+\section{LLM+Systems: Guidance and Repair}
+Recent work augments LLMs with program analysis and feedback loops to raise reliability:
+
+\paragraph{UniTrans (2024).} Generates tests from the source program, augments prompts with I/O contracts, executes translated code, and iteratively repairs failures. Reported sizable gains in computational and exact-match accuracy across multiple LLMs.
+
+\paragraph{TRANSAGENT (2024).} A multi-agent pipeline with an initial translator, a syntax-error fixer, a code-aligner (block mapping via control-flow), and a semantic-error fixer. Uses execution alignment to localize faulty regions before targeted repair; outperforms prior LLM baselines in effectiveness and efficiency.
+
+\paragraph{Program State Alignment / Instrumentation (2024).} Instruments both source and translated code to collect runtime traces and prompt the LLM to align internal states, not just final outputs. On long-code benchmarks, this substantially improved computational accuracy for several models.
+
+\paragraph{Code Co-Evolution / Edit Translation (Codeditor, FSE'23).} Models cross-language \emph{edits} rather than whole-file translation to propagate bug fixes/features across multilingual codebases (e.g., Java/C\#), reflecting how developers actually work.
+
+\section{Comparative Summary}
+\begin{table}[h]
+\centering
+\renewcommand{\arraystretch}{1.2}
+\begin{tabularx}{\textwidth}{@{}p{3.2cm}X X p{3.8cm}@{}}
+\toprule
+\textbf{Category} & \textbf{Strengths} & \textbf{Limitations} & \textbf{Representative Work} \\
+\midrule
+Rule-based translators & Predictable, stable output; developer control & High rule cost; poor adaptability; ambiguous constructs hard; often non-idiomatic output & Early AST rewrites; commercial transpilers \\
+Unsupervised neural (pre-LLM) & No parallel data needed; beats rule-based on functions & Heavy training cost; function-level focus; syntax/semantic errors remain & TransCoder (2020) \\
+LLM-only translation & Broad language coverage; handles complex patterns; low setup & Context limits; bug patterns; semantic drift; nondeterminism & ICSE'24 bug taxonomy study \\
+LLM + guidance/repair & Execution/test signals localize and fix errors; big accuracy gains & Infra overhead; gains vary by model/task; long code remains hard & UniTrans (2024), TRANSAGENT (2024), State-Alignment (2024) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Trends and Outlook}
+The research trajectory moves from hand-crafted rules to data-driven models and then to \emph{LLM-centered systems} that integrate testing, analysis, and repair. Reliable migration at scale will likely combine:
+\begin{itemize}[noitemsep]
+  \item Static/dynamic analysis (CFG/DFG reasoning, type inference, trace alignment).
+  \item Execution-based validation (unit/property tests, metamorphic relations).
+  \item Human-in-the-loop adjudication for tricky semantics and API adaptation.
+  \item Project-level planning (module partitioning, dependency mapping, API shims) to overcome context limits.
+\end{itemize}
+
+\section*{Key References (informal)}
+\begin{enumerate}[leftmargin=*]
+  \item Lachaux, Rozière, Chanussot, Lample. \emph{Unsupervised Translation of Programming Languages} (TransCoder), 2020.
+  \item Pan et al. \emph{Lost in Translation: A Study of Bugs Introduced by LLMs while Translating Code}, ICSE 2024.
+  \item Yang et al. \emph{UniTrans: Enhancing LLM-based Code Translation via Test Generation and Repair}, 2024.
+  \item Yuan et al. \emph{TRANSAGENT: An LLM-Based Multi-Agent System for Code Translation}, 2024.
+  \item Li et al. \emph{Enhancing LLMs in Long Code Translation through Instrumentation and Program State Alignment}, 2024.
+  \item Zhang, Nie, Li, Gligoric. \emph{Multilingual Code Co-Evolution Using Large Language Models} (Codeditor), ESEC/FSE 2023.
+\end{enumerate}
+
+\end{document}

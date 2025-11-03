@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m uvicorn:*)",
+      "Bash(npm run dev:*)",
+      "Bash(git check-ignore:*)",
+      "Bash(git push:*)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\bene_\\Desktop\\aryou\\PythonSoapSolution",
+      "C:\\Users\\bene_\\Desktop\\lab-soap-service",
+      "C:\\Users\\bene_\\Desktop\\lab-soap-migration-agent-v1"
+    ]
+  }
+}
