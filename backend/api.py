@@ -5,15 +5,19 @@ Provides endpoints to trigger research and manage tools database
 
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, AsyncIterator
 import json
 import os
+import asyncio
 from pathlib import Path
 from datetime import datetime
+from queue import Queue
 
 from agents.research_agent import ToolResearchAgent, ToolCuratorAgent
 from agents.openai_websearch_agent import OpenAIWebSearchAgent
+from agents.claude_autonomous_agent import ClaudeAutonomousAgent
 
 app = FastAPI(title="Agentic Tool Research API", version="1.0.0")
 
@@ -344,6 +348,248 @@ def openai_research_topic(request: TopicResearchRequest):
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# ============================================================================
+# Claude Autonomous Agent Endpoints
+# ============================================================================
+
+# Global progress queue for SSE
+progress_queue = Queue()
+
+# Claude research status
+claude_research_status = {
+    "is_running": False,
+    "last_run": None,
+    "last_result": None,
+    "current_progress": []
+}
+
+
+class ClaudeResearchRequest(BaseModel):
+    focus_areas: Optional[List[str]] = None
+    max_tools: int = 10
+    agent_type: str = "claude"  # "claude" or "openai" for backwards compat
+
+
+@app.post("/tools/research/claude")
+async def trigger_claude_research(request: ClaudeResearchRequest, background_tasks: BackgroundTasks):
+    """
+    Trigger autonomous research using Claude Agent SDK
+
+    This endpoint starts an autonomous research session where Claude:
+    - Creates its own research strategy
+    - Executes web searches independently
+    - Validates and enriches discovered tools
+    - Analyzes public sentiment using real web search
+
+    Returns immediately with status. Use /tools/research/claude/status for updates.
+    """
+    if claude_research_status["is_running"]:
+        return {
+            "status": "already_running",
+            "message": "Claude research is already in progress. Check /tools/research/claude/status"
+        }
+
+    # Clear previous progress
+    claude_research_status["current_progress"] = []
+
+    # Clear the queue
+    while not progress_queue.empty():
+        try:
+            progress_queue.get_nowait()
+        except:
+            break
+
+    # Run research in background
+    background_tasks.add_task(
+        run_claude_research_pipeline,
+        focus_areas=request.focus_areas,
+        max_tools=request.max_tools
+    )
+
+    return {
+        "status": "started",
+        "message": "Claude autonomous research started. Monitor progress at /tools/research/claude/progress",
+        "agent": "claude-sonnet-4-20250514"
+    }
+
+
+@app.get("/tools/research/claude/status")
+def get_claude_research_status():
+    """Get current Claude research status"""
+    if claude_research_status["is_running"]:
+        return {
+            "status": "running",
+            "message": "Research in progress...",
+            "progress": claude_research_status["current_progress"][-10:]  # Last 10 updates
+        }
+
+    if claude_research_status["last_result"]:
+        return {
+            "status": "completed",
+            "message": f"Last research completed at {claude_research_status['last_run']}",
+            "discovered_count": claude_research_status["last_result"].get("discovered"),
+            "added_count": claude_research_status["last_result"].get("added"),
+            "progress": claude_research_status["current_progress"]
+        }
+
+    return {
+        "status": "idle",
+        "message": "No research has been run yet"
+    }
+
+
+@app.get("/tools/research/claude/progress")
+async def claude_research_progress_stream():
+    """
+    Server-Sent Events stream for real-time research progress
+
+    Connect to this endpoint to receive live updates as the agent works.
+    Format: text/event-stream
+    """
+    async def event_generator() -> AsyncIterator[str]:
+        """Generate SSE events from progress queue"""
+        try:
+            while True:
+                # Check if research is still running
+                if not claude_research_status["is_running"] and progress_queue.empty():
+                    # Send final event
+                    yield f"data: {json.dumps({'type': 'complete', 'message': 'Research complete'})}\n\n"
+                    break
+
+                # Wait for progress updates
+                await asyncio.sleep(0.5)
+
+                # Get all available progress updates
+                updates = []
+                while not progress_queue.empty():
+                    try:
+                        update = progress_queue.get_nowait()
+                        updates.append(update)
+                    except:
+                        break
+
+                # Send updates as SSE
+                for update in updates:
+                    event_data = json.dumps({
+                        "type": "progress",
+                        "message": update,
+                        "timestamp": datetime.now().isoformat()
+                    })
+                    yield f"data: {event_data}\n\n"
+
+        except asyncio.CancelledError:
+            # Client disconnected
+            pass
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+        }
+    )
+
+
+def run_claude_research_pipeline(focus_areas: Optional[List[str]] = None, max_tools: int = 10):
+    """
+    Background task: Run the Claude autonomous research pipeline
+
+    This is where the magic happens - Claude autonomously:
+    1. Plans research strategy
+    2. Executes web searches
+    3. Discovers and validates tools
+    4. Analyzes public sentiment with real web search
+    5. Enriches tool metadata
+    """
+    global claude_research_status
+
+    claude_research_status["is_running"] = True
+    claude_research_status["current_progress"] = []
+
+    def progress_callback(message: str):
+        """Callback for agent progress updates"""
+        progress_queue.put(message)
+        claude_research_status["current_progress"].append({
+            "message": message,
+            "timestamp": datetime.now().isoformat()
+        })
+
+    try:
+        print(f"[CLAUDE RESEARCH] Starting autonomous research...")
+        progress_callback("🚀 Initializing Claude autonomous agent...")
+
+        # Initialize Claude agent with progress callback
+        agent = ClaudeAutonomousAgent(progress_callback=progress_callback)
+
+        # Run autonomous research
+        progress_callback(f"🎯 Focus areas: {focus_areas or 'General agentic tools'}")
+        progress_callback(f"🎯 Target: {max_tools} tools")
+
+        discovered_tools = agent.research_tools(
+            focus_areas=focus_areas,
+            max_tools=max_tools
+        )
+
+        progress_callback(f"✅ Research complete! Discovered {len(discovered_tools)} tools")
+
+        # Merge with existing database
+        existing_tools = load_tools()
+        existing_titles = {t["title"].lower() for t in existing_tools}
+
+        # Filter out tools that already exist (or update them)
+        new_tools = []
+        for tool in discovered_tools:
+            if tool["title"].lower() not in existing_titles:
+                new_tools.append(tool)
+
+        if new_tools:
+            # Assign IDs
+            max_id = max([t.get("id", 0) for t in existing_tools], default=0)
+            for idx, tool in enumerate(new_tools, start=max_id + 1):
+                tool["id"] = idx
+
+            # Add to database
+            all_tools = existing_tools + new_tools
+            save_tools(all_tools)
+
+            progress_callback(f"💾 Saved {len(new_tools)} new tools to database")
+        else:
+            progress_callback("ℹ️ No new tools found (all were duplicates)")
+
+        # Log research activity
+        log_research({
+            "agent": "claude-autonomous",
+            "focus_areas": focus_areas,
+            "max_tools": max_tools,
+            "discovered": len(discovered_tools),
+            "new_tools": len(new_tools)
+        })
+
+        # Update status
+        claude_research_status["last_run"] = datetime.now().isoformat()
+        claude_research_status["last_result"] = {
+            "discovered": len(discovered_tools),
+            "added": len(new_tools)
+        }
+
+        progress_callback("✨ Research session complete!")
+
+        print(f"[CLAUDE RESEARCH] Success! Added {len(new_tools)} tools")
+
+    except Exception as e:
+        error_msg = f"❌ Research error: {str(e)}"
+        progress_callback(error_msg)
+        print(f"[CLAUDE RESEARCH] Error: {e}")
+
+        claude_research_status["last_result"] = {
+            "error": str(e)
+        }
+
+    finally:
+        claude_research_status["is_running"] = False
 
 
 if __name__ == "__main__":

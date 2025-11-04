@@ -3,8 +3,10 @@ import ToolCard from "./ToolCard";
 import CategoryFilter from "./CategoryFilter";
 import SortControl, { SortOption } from "./SortControl";
 import ResearchControls from "./ResearchControls";
+import ClaudeResearchControls from "./ClaudeResearchControls";
 import { fetchTools, Tool } from "@/lib/api";
 import { Loader2 } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const ToolsSection = () => {
   const [activeCategory, setActiveCategory] = useState("all");
@@ -93,8 +95,25 @@ const ToolsSection = () => {
           )}
         </div>
 
-        {/* Research Controls */}
-        <ResearchControls onResearchComplete={handleResearchComplete} />
+        {/* Research Controls - Choose between Claude and OpenAI */}
+        <Tabs defaultValue="claude" className="mb-8">
+          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
+            <TabsTrigger value="claude">
+              🤖 Claude Agent (Recommended)
+            </TabsTrigger>
+            <TabsTrigger value="openai">
+              🔧 OpenAI Research (Legacy)
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="claude" className="mt-6">
+            <ClaudeResearchControls onResearchComplete={handleResearchComplete} />
+          </TabsContent>
+
+          <TabsContent value="openai" className="mt-6">
+            <ResearchControls onResearchComplete={handleResearchComplete} />
+          </TabsContent>
+        </Tabs>
 
         {/* Category Filter */}
         <div className="mb-4">
