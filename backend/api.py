@@ -14,6 +14,7 @@ from datetime import datetime
 
 from agents.research_agent import ToolResearchAgent, ToolCuratorAgent
 from agents.openai_websearch_agent import OpenAIWebSearchAgent
+from agents.openai_tools_websearch_agent import OpenAIToolsWebSearchAgent
 
 app = FastAPI(title="Agentic Tool Research API", version="1.0.0")
 
@@ -120,6 +121,7 @@ def root():
             "/tools/research/status": "GET - Get research status",
             "/tools/research/tags": "GET - Get available research tags",
             "/tools/{tool_id}": "GET - Get specific tool",
+            "/websearch/agentic": "POST - Agentic web search using OpenAI tools",
         }
     }
 
@@ -308,6 +310,14 @@ class TopicResearchRequest(BaseModel):
     aspects: Optional[List[str]] = None
 
 
+class AgenticWebSearchRequest(BaseModel):
+    topic: Optional[str] = None
+    search_terms: List[str]
+    instructions: Optional[str] = None
+    focus_questions: Optional[List[str]] = None
+    max_output_tokens: Optional[int] = None
+
+
 @app.post("/websearch/search")
 def openai_web_search(request: WebSearchRequest):
     """
@@ -342,6 +352,35 @@ def openai_research_topic(request: TopicResearchRequest):
         agent = OpenAIWebSearchAgent()
         result = agent.research_topic(topic=request.topic, aspects=request.aspects)
         return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/websearch/agentic")
+def openai_agentic_research(request: AgenticWebSearchRequest):
+    """
+    Run agentic research using the Responses API with web_search and optional MCP servers.
+
+    Example request:
+    {
+        "topic": "Agentic coding platforms",
+        "search_terms": ["OpenAI MCP connectors", "agentic coding tool adoption"],
+        "instructions": "Focus on enterprise readiness.",
+        "focus_questions": ["Which connectors support SharePoint?"]
+    }
+    """
+    try:
+        agent = OpenAIToolsWebSearchAgent()
+        result = agent.run_agentic_research(
+            topic=request.topic,
+            search_terms=request.search_terms,
+            user_instructions=request.instructions,
+            focus_questions=request.focus_questions,
+            max_output_tokens=request.max_output_tokens,
+        )
+        return result
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

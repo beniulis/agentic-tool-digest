@@ -3,9 +3,10 @@ import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 import ToolsSection from "@/components/ToolsSection";
 import WebSearch from "./WebSearch";
+import AgenticResearch from "./AgenticResearch";
 import { Toaster } from "@/components/ui/toaster";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Database, Search } from "lucide-react";
+import { Database, Search, Sparkles } from "lucide-react";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("tools");
@@ -19,7 +20,7 @@ const Index = () => {
         {/* Navigation Tabs */}
         <div className="container mx-auto px-4 lg:px-8 py-6">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
+            <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-3">
               <TabsTrigger value="tools" className="flex items-center gap-2">
                 <Database className="h-4 w-4" />
                 Tools Directory
@@ -27,6 +28,10 @@ const Index = () => {
               <TabsTrigger value="websearch" className="flex items-center gap-2">
                 <Search className="h-4 w-4" />
                 AI Web Search
+              </TabsTrigger>
+              <TabsTrigger value="agentic" className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4" />
+                Agentic Researcher
               </TabsTrigger>
             </TabsList>
 
@@ -36,6 +41,10 @@ const Index = () => {
 
             <TabsContent value="websearch" className="mt-6">
               <WebSearch />
+            </TabsContent>
+
+            <TabsContent value="agentic" className="mt-6">
+              <AgenticResearch />
             </TabsContent>
           </Tabs>
         </div>
