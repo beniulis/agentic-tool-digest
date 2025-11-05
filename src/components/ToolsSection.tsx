@@ -137,6 +137,7 @@ const ToolsSection = () => {
           {sortedTools.map((tool, index) => (
             <ToolCard
               key={tool.id}
+              id={tool.id}
               title={tool.title}
               description={tool.description}
               category={tool.category}
@@ -155,6 +156,8 @@ const ToolsSection = () => {
               usageNiche={tool.usageNiche}
               communityDiscussions={tool.communityDiscussions}
               sentimentAnalyzedAt={tool.sentimentAnalyzedAt}
+              sentimentSources={tool.sentimentSources}
+              onRefresh={loadTools}
             />
           ))}
         </div>

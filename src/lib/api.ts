@@ -4,6 +4,16 @@
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
+export interface SentimentSource {
+  title: string;
+  url: string;
+}
+
+export interface CommunityDiscussion {
+  point: string;
+  sources?: SentimentSource[];
+}
+
 export interface Tool {
   id: number;
   title: string;
@@ -22,8 +32,9 @@ export interface Tool {
   searchTimestamp?: string;  // When the research session was conducted
   publicSentiment?: string;  // Overall public sentiment
   usageNiche?: string;  // Primary usage niche/demographic
-  communityDiscussions?: string[];  // Key discussion points from community
+  communityDiscussions?: (string | CommunityDiscussion)[];  // Key discussion points from community (can be string for old data or object with sources)
   sentimentAnalyzedAt?: string;  // When sentiment was analyzed
+  sentimentSources?: SentimentSource[];  // All source URLs from sentiment analysis
 }
 
 export interface ResearchStatus {
@@ -120,6 +131,21 @@ export async function getResearchTags(): Promise<string[]> {
 
   const data = await response.json();
   return data.tags;
+}
+
+/**
+ * Refresh sentiment analysis for a specific tool
+ */
+export async function refreshToolSentiment(toolId: number): Promise<{ status: string; message: string }> {
+  const response = await fetch(`${API_BASE_URL}/tools/${toolId}/refresh-sentiment`, {
+    method: 'POST',
+  });
+
+  if (!response.ok) {
+    throw new Error(`Sentiment refresh failed: ${response.statusText}`);
+  }
+
+  return await response.json();
 }
 
 /**

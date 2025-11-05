@@ -9,9 +9,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ExternalLink, Star, Activity, AlertTriangle, Users, MessageSquare, TrendingUp } from "lucide-react";
+import { ExternalLink, Star, Activity, AlertTriangle, Users, MessageSquare, TrendingUp, RefreshCw, Link as LinkIcon } from "lucide-react";
+import { CommunityDiscussion, SentimentSource, refreshToolSentiment } from "@/lib/api";
+import { toast } from "sonner";
 
 interface ToolCardProps {
+  id: number;
   title: string;
   description: string;
   category: string;
@@ -28,11 +31,14 @@ interface ToolCardProps {
   searchTimestamp?: string;
   publicSentiment?: string;
   usageNiche?: string;
-  communityDiscussions?: string[];
+  communityDiscussions?: (string | CommunityDiscussion)[];
   sentimentAnalyzedAt?: string;
+  sentimentSources?: SentimentSource[];
+  onRefresh?: () => void;
 }
 
 const ToolCard = ({
+  id,
   title,
   description,
   category,
@@ -50,9 +56,12 @@ const ToolCard = ({
   publicSentiment,
   usageNiche,
   communityDiscussions = [],
-  sentimentAnalyzedAt
+  sentimentAnalyzedAt,
+  sentimentSources = [],
+  onRefresh
 }: ToolCardProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Use GitHub stars if available, otherwise fall back to stars
   const displayStars = githubStars !== undefined ? githubStars : stars;
@@ -75,6 +84,30 @@ const ToolCard = ({
   };
 
   const projectStatus = getProjectStatus();
+
+  // Handle sentiment refresh
+  const handleRefreshSentiment = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent dialog from opening
+    setIsRefreshing(true);
+
+    try {
+      const result = await refreshToolSentiment(id);
+      toast.success(`Sentiment refresh started for ${title}`, {
+        description: "This may take a minute. The page will update automatically when complete."
+      });
+
+      // Call parent's onRefresh if provided
+      if (onRefresh) {
+        setTimeout(() => onRefresh(), 30000); // Refresh after 30 seconds
+      }
+    } catch (error) {
+      toast.error("Failed to refresh sentiment", {
+        description: error instanceof Error ? error.message : "Unknown error"
+      });
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   // Get sentiment badge color
   const getSentimentColor = (sentiment?: string) => {
@@ -108,15 +141,22 @@ const ToolCard = ({
               <CardTitle className="text-base group-hover:text-primary transition-smooth truncate">
                 {title}
               </CardTitle>
-              {features.length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-1">
-                  {features.slice(0, 2).map((feature, index) => (
-                    <Badge key={index} variant="outline" className="text-xs">
-                      {feature}
-                    </Badge>
-                  ))}
-                </div>
-              )}
+              <div className="flex flex-wrap gap-1 mt-1">
+                {features.slice(0, 2).map((feature, index) => (
+                  <Badge key={index} variant="outline" className="text-xs">
+                    {feature}
+                  </Badge>
+                ))}
+                {publicSentiment && (
+                  <Badge
+                    variant="outline"
+                    className={`text-xs ${getSentimentColor(publicSentiment)}`}
+                    title="Community sentiment analyzed - click to view details"
+                  >
+                    {publicSentiment}
+                  </Badge>
+                )}
+              </div>
             </div>
 
             <div className="flex flex-col items-end gap-1 shrink-0">
@@ -181,9 +221,21 @@ const ToolCard = ({
             {/* Public Sentiment Section */}
             {publicSentiment && (
               <div className="border-t pt-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <TrendingUp className="w-4 h-4 text-primary" />
-                  <h3 className="font-semibold text-sm">Public Sentiment & Community Discussion</h3>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4 text-primary" />
+                    <h3 className="font-semibold text-sm">Public Sentiment & Community Discussion</h3>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleRefreshSentiment}
+                    disabled={isRefreshing}
+                    className="h-8"
+                  >
+                    <RefreshCw className={`w-3 h-3 mr-1 ${isRefreshing ? 'animate-spin' : ''}`} />
+                    {isRefreshing ? 'Refreshing...' : 'Refresh'}
+                  </Button>
                 </div>
 
                 <div className="space-y-3">
@@ -215,12 +267,38 @@ const ToolCard = ({
                         <MessageSquare className="w-4 h-4 text-primary" />
                         <p className="text-xs font-medium text-muted-foreground">Key Discussion Points</p>
                       </div>
-                      <ul className="space-y-2 ml-6">
-                        {communityDiscussions.map((point, index) => (
-                          <li key={index} className="text-sm list-disc">
-                            {point}
-                          </li>
-                        ))}
+                      <ul className="space-y-3 ml-6">
+                        {communityDiscussions.map((discussion, index) => {
+                          // Handle both old format (string) and new format (object with sources)
+                          const isObject = typeof discussion === 'object' && discussion !== null;
+                          const point = isObject ? (discussion as CommunityDiscussion).point : discussion;
+                          const sources = isObject ? (discussion as CommunityDiscussion).sources : undefined;
+
+                          return (
+                            <li key={index} className="text-sm list-disc">
+                              <div className="space-y-1">
+                                <p>{point}</p>
+                                {sources && sources.length > 0 && (
+                                  <div className="flex flex-wrap gap-2 mt-1">
+                                    {sources.map((source, sourceIndex) => (
+                                      <a
+                                        key={sourceIndex}
+                                        href={source.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                                        onClick={(e) => e.stopPropagation()}
+                                      >
+                                        <LinkIcon className="w-3 h-3" />
+                                        Source {sourceIndex + 1}
+                                      </a>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            </li>
+                          );
+                        })}
                       </ul>
                     </div>
                   )}
@@ -231,6 +309,27 @@ const ToolCard = ({
                       Sentiment analyzed on {new Date(sentimentAnalyzedAt).toLocaleDateString()}
                     </p>
                   )}
+                </div>
+              </div>
+            )}
+
+            {/* No Sentiment - Add Sentiment Button */}
+            {!publicSentiment && (
+              <div className="border-t pt-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4 text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground">No sentiment analysis yet</p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleRefreshSentiment}
+                    disabled={isRefreshing}
+                  >
+                    <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+                    {isRefreshing ? 'Analyzing...' : 'Analyze Sentiment'}
+                  </Button>
                 </div>
               </div>
             )}

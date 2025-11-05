@@ -348,7 +348,95 @@
     "version": "2.3.1",
     "discoveredAt": "2025-10-20T17:49:32.726182",
     "searchTimestamp": "2025-10-20T17:44:01.779221",
-    "id": 19
+    "id": 19,
+    "publicSentiment": "Mixed",
+    "usageNiche": "AI-powered code review tool for development teams looking to speed up code reviews and improve velocity, but with mixed reception on practical utility",
+    "communityDiscussions": [
+      {
+        "point": "Generates high volume of trivial issues like missing docstrings, weird naming, and config typos that developers need to sift through",
+        "sources": [
+          {
+            "title": "Anyone used Coderabbit. How is it? : r/opensource",
+            "url": "https://www.reddit.com/r/opensource/comments/1ok0imj/anyone_used_coderabbit_how_is_it/"
+          }
+        ]
+      },
+      {
+        "point": "Helps improve development velocity and code quality by speeding up code reviews",
+        "sources": [
+          {
+            "title": "Show: CodeRabbit - Speeding up Code Reviews : r/agile",
+            "url": "https://www.reddit.com/r/agile/comments/15gxmnm/show_coderabbit_speeding_up_code_reviews/"
+          }
+        ]
+      },
+      {
+        "point": "Has limitations in reasoning about domain boundaries, user experience expectations, and risk tolerance compared to human reviewers",
+        "sources": [
+          {
+            "title": "What's your honest take on AI code review tools?",
+            "url": "https://www.reddit.com/r/ExperiencedDevs/comments/1o1a601/whats_your_honest_take_on_ai_code_review_tools/"
+          }
+        ]
+      },
+      {
+        "point": "Intelligently flags high-risk pull requests to help teams focus their energy and expertise",
+        "sources": [
+          {
+            "title": "bcmgw.com review highlights the benefits of its modern tools..rby",
+            "url": "https://twitter.com/search?q=bcmgw.com%20review%20highlights%20the%20benefits%20of%20its%20modern%20tools..rby"
+          }
+        ]
+      },
+      {
+        "point": "Users acknowledge room for improvement in user experience and may encounter small bugs",
+        "sources": [
+          {
+            "title": "Machine Learning ML & Generative AI News",
+            "url": "https://www.reddit.com/r/machinelearningnews/rising/"
+          }
+        ]
+      }
+    ],
+    "sentimentActivelyDiscussed": false,
+    "recentTrends": "Limited recent discussion activity, with most mentions being brief references rather than detailed reviews. Some mention of recent $16M funding round indicates growing investor interest.",
+    "sentimentConfidence": 0.65,
+    "sentimentAnalyzedAt": "2025-11-05T13:41:11.249961",
+    "sentimentSourcesAnalyzed": 8,
+    "sentimentSources": [
+      {
+        "title": "Carl Mathisen (@carlmathisen) / Posts ...",
+        "url": "https://twitter.com/carlmathisen"
+      },
+      {
+        "title": "Machine Learning ML & Generative AI News",
+        "url": "https://www.reddit.com/r/machinelearningnews/rising/"
+      },
+      {
+        "title": "What's your honest take on AI code review tools?",
+        "url": "https://www.reddit.com/r/ExperiencedDevs/comments/1o1a601/whats_your_honest_take_on_ai_code_review_tools/"
+      },
+      {
+        "title": "Anyone used Coderabbit. How is it? : r/opensource",
+        "url": "https://www.reddit.com/r/opensource/comments/1ok0imj/anyone_used_coderabbit_how_is_it/"
+      },
+      {
+        "title": "Show: CodeRabbit - Speeding up Code Reviews : r/agile",
+        "url": "https://www.reddit.com/r/agile/comments/15gxmnm/show_coderabbit_speeding_up_code_reviews/"
+      },
+      {
+        "title": "bcmgw.com review highlights the benefits of its modern tools..rby",
+        "url": "https://twitter.com/search?q=bcmgw.com%20review%20highlights%20the%20benefits%20of%20its%20modern%20tools..rby"
+      },
+      {
+        "title": "PixelBin (@PixelBinio) / Posts / X",
+        "url": "https://twitter.com/PixelBinio"
+      },
+      {
+        "title": "Real-world experiences with AI coding agents (Devin, SWE ...",
+        "url": "https://www.reddit.com/r/Python/comments/1nf1lmm/realworld_experiences_with_ai_coding_agents_devin/"
+      }
+    ]
   },
   {
     "title": "Cline",
@@ -367,7 +455,107 @@
     "version": "2.0.2",
     "discoveredAt": "2025-10-21T16:37:42.544765",
     "searchTimestamp": "2025-10-21T16:30:51.736135",
-    "id": 20
+    "id": 20,
+    "publicSentiment": "Positive",
+    "usageNiche": "Primarily used by individual developers and power users who switched from other AI coding tools like Cursor, seeking better customization and user experience in VS Code",
+    "communityDiscussions": [
+      {
+        "point": "Users are switching from Cursor to Cline and reporting positive experiences with the transition",
+        "sources": [
+          {
+            "title": "Switched from Cursor to Cline and I'm honestly impressed",
+            "url": "https://www.reddit.com/r/CLine/comments/1k6yo0o/switched_from_cursor_to_cline_and_im_honestly/"
+          }
+        ]
+      },
+      {
+        "point": "Power users want more customization options to improve the user experience further",
+        "sources": [
+          {
+            "title": "Have been a hardcore user of Cline and LOVE it. ...",
+            "url": "https://www.reddit.com/r/CLine/comments/1iar6d4/have_been_a_hardcore_user_of_cline_and_love_it/"
+          },
+          {
+            "title": "Is Cline dying? : r/CLine",
+            "url": "https://www.reddit.com/r/CLine/comments/1nzcbfv/is_cline_dying/"
+          }
+        ]
+      },
+      {
+        "point": "Cline works well with different LLM backends, particularly praised when paired with Gemini 2.5 Pro",
+        "sources": [
+          {
+            "title": "gemini 2.5 pro + CLine is GODLIKE",
+            "url": "https://www.reddit.com/r/CLine/comments/1jlqyrl/gemini_25_pro_cline_is_godlike/"
+          }
+        ]
+      },
+      {
+        "point": "AI tools including Cline are making coding more enjoyable for developers, with nearly 80% reporting positive impact",
+        "sources": [
+          {
+            "title": "Six months later : is AI actually writing 90% of all code?",
+            "url": "https://www.reddit.com/r/BlackboxAI_/comments/1ny2bnj/six_months_later_is_ai_actually_writing_90_of_all/"
+          },
+          {
+            "title": "Claude Sonnet 4.5's Bold Claims Don't Match What ...",
+            "url": "https://www.reddit.com/r/webdev/comments/1nubp4n/claude_sonnet_45s_bold_claims_dont_match_what/"
+          }
+        ]
+      },
+      {
+        "point": "Cline is being compared favorably to other AI coding tools and is holding its own in multi-step reasoning tasks",
+        "sources": [
+          {
+            "title": "GitHub Copilot vs Cursor in 2025: Why I'm paying half price ...",
+            "url": "https://www.reddit.com/r/GithubCopilot/comments/1jnboan/github_copilot_vs_cursor_in_2025_why_im_paying/"
+          },
+          {
+            "title": "Claude Sonnet 4.5's Bold Claims Don't Match What ...",
+            "url": "https://www.reddit.com/r/webdev/comments/1nubp4n/claude_sonnet_45s_bold_claims_dont_match_what/"
+          }
+        ]
+      }
+    ],
+    "sentimentActivelyDiscussed": true,
+    "recentTrends": "Growing adoption in 2025 with users migrating from other tools, increasing focus on customization for power users, and integration into data science workflows alongside other AI coding tools",
+    "sentimentConfidence": 0.8,
+    "sentimentAnalyzedAt": "2025-11-05T13:40:08.251339",
+    "sentimentSourcesAnalyzed": 8,
+    "sentimentSources": [
+      {
+        "title": "Switched from Cursor to Cline and I'm honestly impressed",
+        "url": "https://www.reddit.com/r/CLine/comments/1k6yo0o/switched_from_cursor_to_cline_and_im_honestly/"
+      },
+      {
+        "title": "GitHub Copilot vs Cursor in 2025: Why I'm paying half price ...",
+        "url": "https://www.reddit.com/r/GithubCopilot/comments/1jnboan/github_copilot_vs_cursor_in_2025_why_im_paying/"
+      },
+      {
+        "title": "Six months later : is AI actually writing 90% of all code?",
+        "url": "https://www.reddit.com/r/BlackboxAI_/comments/1ny2bnj/six_months_later_is_ai_actually_writing_90_of_all/"
+      },
+      {
+        "title": "Have been a hardcore user of Cline and LOVE it. ...",
+        "url": "https://www.reddit.com/r/CLine/comments/1iar6d4/have_been_a_hardcore_user_of_cline_and_love_it/"
+      },
+      {
+        "title": "Is Cline dying? : r/CLine",
+        "url": "https://www.reddit.com/r/CLine/comments/1nzcbfv/is_cline_dying/"
+      },
+      {
+        "title": "gemini 2.5 pro + CLine is GODLIKE",
+        "url": "https://www.reddit.com/r/CLine/comments/1jlqyrl/gemini_25_pro_cline_is_godlike/"
+      },
+      {
+        "title": "Claude Sonnet 4.5's Bold Claims Don't Match What ...",
+        "url": "https://www.reddit.com/r/webdev/comments/1nubp4n/claude_sonnet_45s_bold_claims_dont_match_what/"
+      },
+      {
+        "title": "What's your 2025 data science coding stack + AI tools ...",
+        "url": "https://www.reddit.com/r/datascience/comments/1k26kp3/whats_your_2025_data_science_coding_stack_ai/"
+      }
+    ]
   },
   {
     "title": "ChatGPT Code Review (GitHub Action)",
@@ -468,5 +656,175 @@
     ],
     "sentimentAnalyzedAt": "2025-10-24T12:12:06.305701",
     "id": 24
+  },
+  {
+    "title": "Qodo",
+    "description": "Qodo is an AI-powered code quality platform that helps teams ship reliable, compliant, and production-ready code fast. Instead of focusing solely on code generation, Qodo prioritizes agentic code review, test coverage, and code integrity at scale. It integrates directly into VS Code, JetBrains, and other development environments to provide comprehensive code quality assurance. The tool is designed for development teams who need robust code review automation and quality control mechanisms.",
+    "url": "https://qodo.ai",
+    "category": "Code Review",
+    "features": [
+      "Agentic code review",
+      "Test coverage analysis",
+      "Code integrity at scale",
+      "IDE integrations"
+    ],
+    "confidence": 0.9,
+    "source_url": "https://www.qodo.ai/blog/best-ai-coding-assistant-tools/",
+    "discoveredAt": "2025-11-05T12:35:42.906316",
+    "discoveryQuery": "\"AI coding assistant\" OR \"agentic coding tool\" 2024 2025 launched released new",
+    "searchProvider": "tavily",
+    "qualityScore": 0.9,
+    "qualityReason": "Comprehensive AI-powered code quality platform",
+    "publicSentiment": "Mixed",
+    "usageNiche": "Quality assurance engineers and backend developers using it for test automation, code quality checks, and integration with existing testing frameworks like NUnit",
+    "communityDiscussions": [
+      "Praised for code review capabilities but lacks context understanding according to developers",
+      "Users appreciate the user experience but note it lacks domain reasoning abilities",
+      "Being used alongside traditional tools like SonarQube and ESLint in QA workflows",
+      "Mentioned as helpful for .NET developers using NUnit for unit and integration testing",
+      "AI cannot reason about domain boundaries, user experience expectations, or regulatory context"
+    ],
+    "sentimentActivelyDiscussed": false,
+    "recentTrends": "Limited recent discussion activity, mostly mentioned in context of broader AI testing tool comparisons and QA tool recommendations",
+    "sentimentConfidence": 0.65,
+    "sentimentAnalyzedAt": "2025-11-05T12:38:51.075569",
+    "sentimentSourcesAnalyzed": 8,
+    "id": 25
+  },
+  {
+    "title": "Amazon Q Developer",
+    "description": "Amazon Q Developer is AWS's entry into AI coding assistants, announced in 2024 and evolved from Amazon's CodeWhisperer. It integrates with JetBrains IDEs and VS Code via plugins and uniquely provides a CLI agent for terminal workflows. The tool is designed to handle large projects and multiple tasks through '/dev' agents that can implement comprehensive solutions. It's targeted at developers working within the AWS ecosystem who need enterprise-grade AI coding assistance.",
+    "url": "https://aws.amazon.com/q/developer/",
+    "category": "Developer Platform",
+    "features": [
+      "CLI agent support",
+      "Large project handling",
+      "/dev agents for comprehensive solutions",
+      "AWS ecosystem integration"
+    ],
+    "confidence": 0.9,
+    "source_url": "https://www.shakudo.io/blog/best-ai-coding-assistants",
+    "discoveredAt": "2025-11-05T12:35:42.906317",
+    "discoveryQuery": "\"AI coding assistant\" OR \"agentic coding tool\" 2024 2025 launched released new",
+    "searchProvider": "tavily",
+    "qualityScore": 0.9,
+    "qualityReason": "AWS-backed AI coding assistant with enterprise features",
+    "publicSentiment": "Mixed",
+    "usageNiche": "AWS ecosystem developers using JetBrains IDEs and VS Code, particularly for code generation and debugging within enterprise AWS environments",
+    "communityDiscussions": [
+      "Users praise Amazon Q Developer for code generation and debugging capabilities",
+      "Integration with JetBrains IDEs is considered subpar, with reports of IntelliJ crashing",
+      "Works well as a co-developer tool for AWS development workflows",
+      "Better user experience reported in VS Code compared to JetBrains IDEs",
+      "Some users are enthusiastic about its capabilities, calling it 'next level'"
+    ],
+    "sentimentActivelyDiscussed": false,
+    "recentTrends": "Limited discussion volume with mixed experiences - positive feedback for core functionality but concerns about IDE integration stability, particularly with JetBrains tools",
+    "sentimentConfidence": 0.75,
+    "sentimentAnalyzedAt": "2025-11-05T12:39:00.696241",
+    "sentimentSourcesAnalyzed": 8,
+    "id": 26
+  },
+  {
+    "title": "Replit AI",
+    "description": "An AI-powered coding assistant integrated into the Replit online development environment. It provides intelligent code completions, debugging assistance, and code explanations within the browser-based IDE. Replit AI is designed to help developers of all skill levels write better code faster, with particular strength in educational settings and collaborative coding projects. The tool leverages the cloud-based nature of Replit to provide seamless AI assistance without requiring local setup.",
+    "url": "https://replit.com",
+    "category": "Developer Platform",
+    "features": [
+      "Browser-based coding",
+      "AI code assistance",
+      "Collaborative features",
+      "Educational support"
+    ],
+    "confidence": 0.8,
+    "source_url": "https://ekkorre.com/ai-tools",
+    "discoveredAt": "2025-11-05T12:36:08.403487",
+    "discoveryQuery": "\"best AI coding tools 2024\" OR \"top developer AI platforms 2025\" comparison review",
+    "searchProvider": "tavily",
+    "qualityScore": 0.8,
+    "qualityReason": "Well-integrated into popular online development platform",
+    "publicSentiment": "Mixed",
+    "usageNiche": "Web app development and AI-powered coding, particularly among developers experimenting with AI agents and automated coding solutions",
+    "communityDiscussions": [
+      "AI agents prioritize AI-determined helpfulness over explicit user control, causing frustration with lack of developer control",
+      "Recent pricing model changes have generated significant discussion and user concerns about value proposition",
+      "Staff layoffs have negatively impacted user experience and platform stability",
+      "Users report mixed success with AI agent deployment, citing issues with AI procrastination and random behavior",
+      "Platform is being compared to competitors with concerns about Replit losing market position"
+    ],
+    "sentimentActivelyDiscussed": true,
+    "recentTrends": "Negative sentiment around pricing changes, staff layoffs affecting user experience, and growing skepticism about AI agent reliability with warnings like 'Buyer Beware' gaining traction",
+    "sentimentConfidence": 0.8,
+    "sentimentAnalyzedAt": "2025-11-05T12:39:19.143792",
+    "sentimentSourcesAnalyzed": 8,
+    "id": 27
+  },
+  {
+    "title": "JetBrains AI",
+    "description": "JetBrains' native AI coding assistant integrated directly into their suite of IDEs including IntelliJ IDEA, PyCharm, and WebStorm. It provides intelligent code completion, generation, and assistance features specifically optimized for JetBrains' development environments. The tool leverages deep integration with JetBrains' code analysis capabilities to provide more contextually accurate suggestions. It's designed to work seamlessly within the existing JetBrains workflow that many professional developers already use.",
+    "url": "https://www.jetbrains.com/ai/",
+    "category": "IDE/Editor",
+    "features": [
+      "Native JetBrains IDE integration",
+      "Context-aware code generation",
+      "Multi-language support",
+      "Deep code analysis integration"
+    ],
+    "confidence": 0.9,
+    "source_url": "https://news.ycombinator.com/item?id=41189666",
+    "discoveredAt": "2025-11-05T12:36:32.788692",
+    "discoveryQuery": "site:news.ycombinator.com \"coding AI\" OR \"AI developer tools\" OR \"code assistant\" 2024",
+    "searchProvider": "tavily",
+    "qualityScore": 0.9,
+    "qualityReason": "Native integration with widely-used JetBrains IDEs",
+    "publicSentiment": "Mixed",
+    "usageNiche": "JetBrains IDE users (IntelliJ, WebStorm, Android Studio) evaluating AI coding assistants, particularly developers comparing it to GitHub Copilot and other alternatives",
+    "communityDiscussions": [
+      "Performance disappointment - users report JetBrains AI 'had no clue' compared to alternatives like Copilot",
+      "Poor ratings across JetBrains AI offerings - 'none of jetbrains AI offerings are close to a 4.0 rating'",
+      "User experience fragmentation - criticism of feature separation affecting UX perspective",
+      "Integration benefits - some appreciate the smooth user experience within JetBrains ecosystem",
+      "Pricing concerns - users questioning value proposition as JetBrains raises prices while AI features disappoint"
+    ],
+    "sentimentActivelyDiscussed": true,
+    "recentTrends": "Growing developer frustration with JetBrains AI performance leading to consideration of alternatives, with specific criticism of 'Junie' assistant and discussions about local AI adoption as potential solutions",
+    "sentimentConfidence": 0.8,
+    "sentimentAnalyzedAt": "2025-11-05T12:39:28.324586",
+    "sentimentSourcesAnalyzed": 8,
+    "id": 28
+  },
+  {
+    "title": "GitLab Duo",
+    "description": "GitLab's integrated AI-powered development assistant that provides code suggestions, vulnerability detection, and automated code review capabilities within the GitLab ecosystem. It's designed to work seamlessly with GitLab's DevOps platform, offering AI assistance throughout the entire software development lifecycle. The tool helps developers write code faster while maintaining security and quality standards through intelligent analysis. It's particularly valuable for teams already using GitLab for their version control and CI/CD workflows.",
+    "url": "https://about.gitlab.com/solutions/gitlab-duo/",
+    "category": "Developer Platform",
+    "features": [
+      "GitLab ecosystem integration",
+      "Vulnerability detection",
+      "Code review automation",
+      "DevOps lifecycle support"
+    ],
+    "confidence": 0.85,
+    "source_url": "https://news.ycombinator.com/item?id=41189666",
+    "discoveredAt": "2025-11-05T12:36:32.788695",
+    "discoveryQuery": "site:news.ycombinator.com \"coding AI\" OR \"AI developer tools\" OR \"code assistant\" 2024",
+    "searchProvider": "tavily",
+    "qualityScore": 0.85,
+    "qualityReason": "Comprehensive DevOps platform with integrated AI",
+    "publicSentiment": "Mixed",
+    "usageNiche": "GitLab Premium customers using integrated DevOps workflows, particularly teams focused on CI/CD, code reviews, and comprehensive development lifecycle management",
+    "communityDiscussions": [
+      "Overall good experience with features beyond code-related functionality, specifically for DevOps, CI/CD, code reviews, and code quality",
+      "Security concerns raised about remote prompt injection vulnerabilities in GitLab Duo leading to source code exposure",
+      "Code review assistance perceived as 'noise' by experienced reviewers who need full context for high-stakes code reviews",
+      "Available as add-on purchase for Premium customers (SaaS and Self-Managed) as of GitLab v18.0 release in May 2025",
+      "New features being developed around merge requests including MR creation help and comment summarization"
+    ],
+    "sentimentActivelyDiscussed": true,
+    "recentTrends": "Recent discussions focus on availability expansion to Premium tier customers and ongoing development of merge request features, while security vulnerabilities and code review effectiveness remain active concerns",
+    "sentimentConfidence": 0.75,
+    "sentimentAnalyzedAt": "2025-11-05T12:39:38.102736",
+    "sentimentSourcesAnalyzed": 8,
+    "id": 29
   }
 ]

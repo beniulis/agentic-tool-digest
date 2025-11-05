@@ -14,6 +14,10 @@ import asyncio
 from pathlib import Path
 from datetime import datetime
 from queue import Queue
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 from agents.research_agent import ToolResearchAgent, ToolCuratorAgent
 from agents.openai_websearch_agent import OpenAIWebSearchAgent
@@ -70,6 +74,12 @@ class Tool(BaseModel):
     version: Optional[str] = "1.0.0"
     lastUpdated: Optional[str] = "recently"
     discoveredAt: Optional[str] = None
+    searchTimestamp: Optional[str] = None
+    publicSentiment: Optional[str] = None
+    usageNiche: Optional[str] = None
+    communityDiscussions: Optional[List] = None  # Can be List[str] or List[dict] with sources
+    sentimentAnalyzedAt: Optional[str] = None
+    sentimentSources: Optional[List[dict]] = None  # List of {"title": str, "url": str}
 
 
 # In-memory research status
@@ -600,6 +610,64 @@ def run_claude_research_pipeline(focus_areas: Optional[List[str]] = None, max_to
 
     finally:
         claude_research_status["is_running"] = False
+
+
+@app.post("/tools/{tool_id}/refresh-sentiment")
+async def refresh_tool_sentiment(tool_id: int, background_tasks: BackgroundTasks):
+    """
+    Refresh sentiment analysis for a specific tool
+
+    This allows updating sentiment for existing tools without sentiment data
+    or refreshing outdated sentiment analysis
+    """
+    tools = load_tools()
+    tool = next((t for t in tools if t["id"] == tool_id), None)
+
+    if not tool:
+        raise HTTPException(status_code=404, detail="Tool not found")
+
+    # Run sentiment analysis in background
+    background_tasks.add_task(
+        refresh_sentiment_for_tool,
+        tool_id=tool_id
+    )
+
+    return {
+        "status": "started",
+        "message": f"Sentiment refresh started for {tool['title']}",
+        "tool_id": tool_id
+    }
+
+
+def refresh_sentiment_for_tool(tool_id: int):
+    """Background task to refresh sentiment for a single tool"""
+    try:
+        tools = load_tools()
+        tool_index = next((i for i, t in enumerate(tools) if t["id"] == tool_id), None)
+
+        if tool_index is None:
+            print(f"[SENTIMENT REFRESH] Tool {tool_id} not found")
+            return
+
+        tool = tools[tool_index]
+        print(f"[SENTIMENT REFRESH] Starting sentiment analysis for: {tool['title']}")
+
+        # Create Claude agent
+        agent = ClaudeAutonomousAgent()
+
+        # Run sentiment analysis on this one tool
+        enriched_tools = agent._analyze_sentiment_for_tools([tool])
+
+        if enriched_tools:
+            # Update the tool in the database
+            tools[tool_index] = enriched_tools[0]
+            save_tools(tools)
+            print(f"[SENTIMENT REFRESH] Successfully updated sentiment for {tool['title']}")
+
+    except Exception as e:
+        print(f"[SENTIMENT REFRESH] Error: {e}")
+
+
 @app.post("/websearch/agentic")
 def openai_agentic_research(request: AgenticWebSearchRequest):
     """

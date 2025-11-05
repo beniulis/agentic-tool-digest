@@ -73,7 +73,14 @@ class ClaudeAutonomousAgent:
 
     def _log_progress(self, message: str, data: Optional[Dict] = None):
         """Log progress with optional data"""
-        self.progress_callback(message)
+        # Handle encoding issues for Windows console
+        try:
+            self.progress_callback(message)
+        except UnicodeEncodeError:
+            # Fallback: encode with ASCII and replace non-ASCII chars
+            safe_message = message.encode('ascii', 'replace').decode('ascii')
+            self.progress_callback(safe_message)
+
         log_entry = {
             "timestamp": datetime.now().isoformat(),
             "message": message,
@@ -96,26 +103,26 @@ class ClaudeAutonomousAgent:
         Returns:
             List of discovered and validated tools
         """
-        self._log_progress("🚀 Starting autonomous research session")
+        self._log_progress("Starting autonomous research session")
 
         # Phase 1: Planning
         research_plan = self._create_research_plan(focus_areas, max_tools)
-        self._log_progress(f"📋 Created research plan with {len(research_plan['queries'])} queries")
+        self._log_progress(f"Created research plan with {len(research_plan['queries'])} queries")
 
         # Phase 2: Discovery
         for i, query in enumerate(research_plan["queries"], 1):
-            self._log_progress(f"🔍 Executing search {i}/{len(research_plan['queries'])}: {query}")
+            self._log_progress(f"Executing search {i}/{len(research_plan['queries'])}: {query}")
             self._execute_discovery_query(query)
 
-        self._log_progress(f"✅ Discovery complete. Found {len(self.discovered_tools)} potential tools")
+        self._log_progress(f"Discovery complete. Found {len(self.discovered_tools)} potential tools")
 
         # Phase 3: Validation & Enrichment
         validated_tools = self._validate_and_enrich_tools()
-        self._log_progress(f"✅ Validation complete. {len(validated_tools)} tools passed quality checks")
+        self._log_progress(f"Validation complete. {len(validated_tools)} tools passed quality checks")
 
         # Phase 4: Sentiment Analysis
         tools_with_sentiment = self._analyze_sentiment_for_tools(validated_tools)
-        self._log_progress(f"✅ Sentiment analysis complete for {len(tools_with_sentiment)} tools")
+        self._log_progress(f"Sentiment analysis complete for {len(tools_with_sentiment)} tools")
 
         return tools_with_sentiment[:max_tools]
 
@@ -129,7 +136,7 @@ class ClaudeAutonomousAgent:
 
         The agent decides what search queries will be most effective
         """
-        self._log_progress("🤔 Planning research strategy...")
+        self._log_progress("Planning research strategy...")
 
         prompt = f"""You are an autonomous research agent tasked with discovering agentic coding tools.
 
@@ -244,7 +251,7 @@ Be thorough but accurate. Include 3-7 tools maximum per search."""
         Validate discovered tools and enrich with metadata
         Uses Claude to assess quality and remove duplicates
         """
-        self._log_progress("🔍 Validating and enriching discovered tools...")
+        self._log_progress("Validating and enriching discovered tools...")
 
         if not self.discovered_tools:
             return []
@@ -319,7 +326,7 @@ Be selective but fair. List indices (1-based) of HIGH QUALITY tools only."""
         Analyze public sentiment for each tool using real web search
         This is the key feature requested by the user
         """
-        self._log_progress("💭 Analyzing public sentiment with web search...")
+        self._log_progress("Analyzing public sentiment with web search...")
 
         enriched_tools = []
 
@@ -332,6 +339,13 @@ Be selective but fair. List indices (1-based) of HIGH QUALITY tools only."""
                 max_results=8
             )
 
+            # Extract source URLs for attribution
+            source_urls = [
+                {"title": result.get("title", ""), "url": result.get("url", "")}
+                for result in sentiment_results.get("results", [])
+                if result.get("url")
+            ]
+
             # Use Claude to synthesize sentiment from real search results
             formatted_results = self.web_search.format_for_claude(sentiment_results)
 
@@ -341,13 +355,14 @@ Tool: {tool['title']}
 Description: {tool.get('description', 'N/A')}
 Category: {tool.get('category', 'N/A')}
 
-REAL SEARCH RESULTS:
+REAL SEARCH RESULTS (with source numbers):
 {formatted_results}
 
 Based on these actual search results, provide:
 1. **Overall Sentiment**: One of: "Very Positive", "Positive", "Mixed", "Neutral", "Negative", "Not Widely Discussed"
 2. **Usage Niche**: Specific use case and user demographic based on what you found
 3. **Key Discussion Points**: 3-5 actual points from the search results (both positive and critical)
+   - For each discussion point, include which source number(s) [1-8] support it
 4. **Activity Level**: Is it actively discussed? (true/false)
 5. **Recent Trends**: Any trends visible in recent discussions
 
@@ -357,9 +372,9 @@ Return ONLY valid JSON:
   "usageNiche": "Description based on actual findings",
   "activelyDiscussed": true,
   "discussions": [
-    "Actual point from search results 1",
-    "Actual point from search results 2",
-    "Actual point from search results 3"
+    {{"point": "Actual point from search results 1", "sources": [1, 3]}},
+    {{"point": "Actual point from search results 2", "sources": [2, 5]}},
+    {{"point": "Actual point from search results 3", "sources": [1, 4, 7]}}
   ],
   "recentTrends": "What's trending in recent discussions",
   "confidence": 0.85,
@@ -379,15 +394,38 @@ Base your analysis ONLY on the search results provided. Be honest if there's lim
                 sentiment_data = self._extract_json(content)
 
                 if sentiment_data:
+                    # Process discussions to map source indices to URLs
+                    discussions = sentiment_data.get("discussions", [])
+                    processed_discussions = []
+
+                    for disc in discussions:
+                        if isinstance(disc, dict):
+                            # New format with sources
+                            point = disc.get("point", "")
+                            source_indices = disc.get("sources", [])
+                            # Map source indices (1-based) to actual URLs
+                            source_links = [
+                                source_urls[idx - 1] for idx in source_indices
+                                if 0 < idx <= len(source_urls)
+                            ]
+                            processed_discussions.append({
+                                "point": point,
+                                "sources": source_links
+                            })
+                        else:
+                            # Old format (just string) - keep as is for backward compatibility
+                            processed_discussions.append({"point": disc, "sources": []})
+
                     # Add sentiment data to tool
                     tool["publicSentiment"] = sentiment_data.get("sentiment", "Unknown")
                     tool["usageNiche"] = sentiment_data.get("usageNiche", "")
-                    tool["communityDiscussions"] = sentiment_data.get("discussions", [])
+                    tool["communityDiscussions"] = processed_discussions
                     tool["sentimentActivelyDiscussed"] = sentiment_data.get("activelyDiscussed", False)
                     tool["recentTrends"] = sentiment_data.get("recentTrends", "")
                     tool["sentimentConfidence"] = sentiment_data.get("confidence", 0.5)
                     tool["sentimentAnalyzedAt"] = datetime.now().isoformat()
                     tool["sentimentSourcesAnalyzed"] = sentiment_data.get("sources_analyzed", 0)
+                    tool["sentimentSources"] = source_urls  # Store all source URLs
 
                     self._log_progress(f"    Sentiment: {tool['publicSentiment']} (confidence: {tool['sentimentConfidence']:.2f})")
                 else:

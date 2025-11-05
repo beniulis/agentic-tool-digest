@@ -13,7 +13,11 @@
       "Bash(netstat:*)",
       "Bash(findstr:*)",
       "Bash(taskkill:*)",
-      "Bash(nul)"
+      "Bash(nul)",
+      "Bash(python api.py:*)",
+      "Bash(pip install:*)",
+      "Bash(python:*)",
+      "Bash(cat:*)"
     ],
     "additionalDirectories": [
       "C:\\Users\\bene_\\Desktop\\aryou\\PythonSoapSolution",
