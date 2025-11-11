@@ -121,7 +121,8 @@ class WebSearchTool:
                     "title": item.get("title", ""),
                     "url": item.get("url", ""),
                     "content": item.get("content", ""),
-                    "score": item.get("score", 0.0)
+                    "score": item.get("score", 0.0),
+                    "published_date": item.get("published_date", None)  # ISO timestamp when available
                 })
 
             return {
@@ -189,10 +190,13 @@ class WebSearchTool:
         Returns:
             Search results focused on reviews, discussions, and sentiment
         """
-        # Craft queries to find sentiment
+        # Craft queries to find sentiment from diverse sources
+        # Prioritize blogs, tech news, and developer forums, not just Reddit
         sentiment_query = (
-            f'"{tool_name}" reviews opinions "developers say" OR "user experience" '
-            f'reddit OR hackernews OR twitter 2025'
+            f'"{tool_name}" (review OR experience OR opinion OR comparison) '
+            f'(site:medium.com OR site:dev.to OR site:hackernews.com OR site:news.ycombinator.com '
+            f'OR site:reddit.com OR site:stackoverflow.com OR site:producthunt.com) '
+            f'2024 OR 2025'
         )
 
         return self.search(sentiment_query, max_results=max_results, search_depth="advanced")

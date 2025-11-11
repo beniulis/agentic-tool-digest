@@ -6,6 +6,7 @@ Uses Anthropic Claude SDK to autonomously discover and research agentic coding t
 import os
 import json
 import re
+import requests
 from typing import List, Dict, Optional, Callable
 from datetime import datetime
 from anthropic import Anthropic
@@ -339,9 +340,13 @@ Be selective but fair. List indices (1-based) of HIGH QUALITY tools only."""
                 max_results=8
             )
 
-            # Extract source URLs for attribution
+            # Extract source URLs for attribution with timestamps
             source_urls = [
-                {"title": result.get("title", ""), "url": result.get("url", "")}
+                {
+                    "title": result.get("title", ""),
+                    "url": result.get("url", ""),
+                    "published_date": result.get("published_date", None)
+                }
                 for result in sentiment_results.get("results", [])
                 if result.get("url")
             ]
@@ -434,9 +439,93 @@ Base your analysis ONLY on the search results provided. Be honest if there's lim
             except Exception as e:
                 self._log_progress(f"    Error analyzing sentiment: {e}")
 
+            # Fetch GitHub data if available
+            github_data = self._fetch_github_data(tool)
+            if github_data:
+                tool.update(github_data)
+                self._log_progress(f"    GitHub: {github_data.get('githubStars', 0)} stars")
+
             enriched_tools.append(tool)
 
         return enriched_tools
+
+    def _fetch_github_data(self, tool: Dict) -> Optional[Dict]:
+        """
+        Fetch GitHub repository data if the tool has a GitHub URL
+
+        Args:
+            tool: Tool dictionary that may contain GitHub URL
+
+        Returns:
+            Dictionary with GitHub metadata or None if not available
+        """
+        # Try to find GitHub URL in tool data
+        github_url = None
+
+        # Check if URL field contains github.com
+        if "url" in tool and tool["url"] and "github.com" in tool["url"]:
+            github_url = tool["url"]
+
+        # Also check in description for GitHub links
+        if not github_url and "description" in tool:
+            github_match = re.search(r'https?://github\.com/[\w-]+/[\w.-]+', tool.get("description", ""))
+            if github_match:
+                github_url = github_match.group(0)
+
+        if not github_url:
+            return None
+
+        # Extract owner and repo from URL
+        # Format: https://github.com/owner/repo
+        match = re.match(r'https?://github\.com/([\w-]+)/([\w.-]+)', github_url)
+        if not match:
+            return None
+
+        owner, repo = match.groups()
+
+        # Remove .git suffix if present
+        repo = repo.replace('.git', '')
+
+        try:
+            # Fetch repo data from GitHub API
+            api_url = f'https://api.github.com/repos/{owner}/{repo}'
+            headers = {'Accept': 'application/vnd.github.v3+json'}
+
+            # Add GitHub token if available (optional, increases rate limit)
+            github_token = os.getenv('GITHUB_TOKEN')
+            if github_token:
+                headers['Authorization'] = f'token {github_token}'
+
+            response = requests.get(api_url, headers=headers, timeout=10)
+
+            if response.status_code == 200:
+                data = response.json()
+
+                # Calculate days since last push
+                last_pushed = data.get('pushed_at')
+                days_ago = None
+                if last_pushed:
+                    from datetime import datetime
+                    pushed_date = datetime.fromisoformat(last_pushed.replace('Z', '+00:00'))
+                    days_ago = (datetime.now(pushed_date.tzinfo) - pushed_date).days
+
+                return {
+                    'githubUrl': github_url,
+                    'githubStars': data.get('stargazers_count', 0),
+                    'githubLastPushed': last_pushed,
+                    'githubDaysAgo': days_ago
+                }
+            elif response.status_code == 404:
+                self._log_progress(f"    GitHub repo not found: {owner}/{repo}")
+            elif response.status_code == 403:
+                self._log_progress(f"    GitHub API rate limit exceeded")
+            else:
+                self._log_progress(f"    GitHub API error: {response.status_code}")
+
+        except Exception as e:
+            self._log_progress(f"    Error fetching GitHub data: {e}")
+
+        return None
 
     def _deduplicate_tools(self, tools: List[Dict]) -> List[Dict]:
         """Remove duplicate tools based on title and URL"""
@@ -445,8 +534,9 @@ Base your analysis ONLY on the search results provided. Be honest if there's lim
         unique = []
 
         for tool in tools:
-            title = tool.get("title", "").lower().strip()
-            url = tool.get("url", "").lower().strip()
+            # Handle None values properly
+            title = (tool.get("title") or "").lower().strip()
+            url = (tool.get("url") or "").lower().strip()
 
             # Create a normalized key
             if title and url:

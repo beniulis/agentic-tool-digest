@@ -17,7 +17,9 @@
       "Bash(python api.py:*)",
       "Bash(pip install:*)",
       "Bash(python:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(timeout /t 3)",
+      "Bash(ping:*)"
     ],
     "additionalDirectories": [
       "C:\\Users\\bene_\\Desktop\\aryou\\PythonSoapSolution",

@@ -36,9 +36,9 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="relative py-20 lg:py-32 overflow-hidden">
+    <section className="relative py-12 lg:py-16 overflow-hidden">
       {/* Background Image */}
-      <div 
+      <div
         className="absolute inset-0 z-0 opacity-10"
         style={{
           backgroundImage: `url(${heroImage})`,
@@ -47,34 +47,28 @@ const HeroSection = () => {
           backgroundRepeat: 'no-repeat'
         }}
       />
-      
+
       {/* Gradient Overlay */}
       <div className="absolute inset-0 z-10 gradient-hero opacity-90" />
-      
+
       {/* Content */}
       <div className="relative z-20 container mx-auto px-4 lg:px-8">
-        <div className="max-w-4xl mx-auto text-center space-y-8">
+        <div className="max-w-3xl mx-auto text-center space-y-6">
           {/* Main Heading */}
-          <div className="space-y-4 animate-fade-in">
-            <h1 className="text-4xl md:text-6xl font-bold text-primary-foreground leading-tight">
-              The Future of
-              <span className="block bg-gradient-to-r from-accent-foreground to-primary-foreground bg-clip-text text-transparent">
-                Agentic Coding
-              </span>
+          <div className="space-y-3 animate-fade-in">
+            <h1 className="text-3xl md:text-5xl font-bold text-primary-foreground leading-tight">
+              AI Coding Tools
             </h1>
-            <p className="text-xl md:text-2xl text-primary-foreground/80 max-w-2xl mx-auto leading-relaxed">
-              Discover, track, and leverage the latest AI-powered development tools that are transforming how we build software.
+            <p className="text-lg md:text-xl text-primary-foreground/80 max-w-2xl mx-auto">
+              Discover and compare AI-powered development tools
             </p>
           </div>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-slide-up">
-            <Button size="lg" variant="secondary" className="text-lg px-8 py-3" onClick={scrollToTools}>
-              Explore All Tools
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8 py-3 bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/20">
-              Submit a Tool
+          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center animate-slide-up">
+            <Button size="default" variant="secondary" className="px-6" onClick={scrollToTools}>
+              Explore Tools
+              <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
         </div>

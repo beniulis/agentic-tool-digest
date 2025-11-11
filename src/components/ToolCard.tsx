@@ -62,6 +62,7 @@ const ToolCard = ({
 }: ToolCardProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [showSentiment, setShowSentiment] = useState(false);
 
   // Use GitHub stars if available, otherwise fall back to stars
   const displayStars = githubStars !== undefined ? githubStars : stars;
@@ -84,6 +85,34 @@ const ToolCard = ({
   };
 
   const projectStatus = getProjectStatus();
+
+  // Calculate relative time (e.g., "3 days ago", "2 weeks ago", "1 month ago")
+  const getRelativeTime = (dateString?: string): string => {
+    if (!dateString) return "";
+
+    try {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diffMs = now.getTime() - date.getTime();
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+      if (diffDays === 0) return "today";
+      if (diffDays === 1) return "yesterday";
+      if (diffDays < 7) return `${diffDays} days ago`;
+      if (diffDays < 30) {
+        const weeks = Math.floor(diffDays / 7);
+        return weeks === 1 ? "1 week ago" : `${weeks} weeks ago`;
+      }
+      if (diffDays < 365) {
+        const months = Math.floor(diffDays / 30);
+        return months === 1 ? "1 month ago" : `${months} months ago`;
+      }
+      const years = Math.floor(diffDays / 365);
+      return years === 1 ? "1 year ago" : `${years} years ago`;
+    } catch {
+      return "";
+    }
+  };
 
   // Handle sentiment refresh
   const handleRefreshSentiment = async (e: React.MouseEvent) => {
@@ -147,15 +176,6 @@ const ToolCard = ({
                     {feature}
                   </Badge>
                 ))}
-                {publicSentiment && (
-                  <Badge
-                    variant="outline"
-                    className={`text-xs ${getSentimentColor(publicSentiment)}`}
-                    title="Community sentiment analyzed - click to view details"
-                  >
-                    {publicSentiment}
-                  </Badge>
-                )}
               </div>
             </div>
 
@@ -221,95 +241,112 @@ const ToolCard = ({
             {/* Public Sentiment Section */}
             {publicSentiment && (
               <div className="border-t pt-4">
-                <div className="flex items-center justify-between mb-3">
+                <button
+                  onClick={() => setShowSentiment(!showSentiment)}
+                  className="w-full flex items-center justify-between py-2 hover:bg-muted/50 rounded px-2 transition-colors"
+                >
                   <div className="flex items-center gap-2">
                     <TrendingUp className="w-4 h-4 text-primary" />
-                    <h3 className="font-semibold text-sm">Public Sentiment & Community Discussion</h3>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleRefreshSentiment}
-                    disabled={isRefreshing}
-                    className="h-8"
-                  >
-                    <RefreshCw className={`w-3 h-3 mr-1 ${isRefreshing ? 'animate-spin' : ''}`} />
-                    {isRefreshing ? 'Refreshing...' : 'Refresh'}
-                  </Button>
-                </div>
-
-                <div className="space-y-3">
-                  {/* Sentiment Badge */}
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground">Overall Sentiment:</span>
+                    <h3 className="font-semibold text-sm">What people think?</h3>
                     <Badge variant="outline" className={`text-xs ${getSentimentColor(publicSentiment)}`}>
                       {publicSentiment}
                     </Badge>
                   </div>
+                  <svg
+                    className={`w-5 h-5 transition-transform ${showSentiment ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
 
-                  {/* Usage Niche */}
-                  {usageNiche && (
-                    <div className="bg-muted/30 rounded-lg p-3">
-                      <div className="flex items-start gap-2">
-                        <Users className="w-4 h-4 mt-0.5 text-primary shrink-0" />
-                        <div>
-                          <p className="text-xs font-medium text-muted-foreground mb-1">Primary Use Case</p>
-                          <p className="text-sm">{usageNiche}</p>
+                {showSentiment && (
+                  <div className="space-y-3 mt-3 px-2">
+                    <div className="flex justify-end">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleRefreshSentiment}
+                        disabled={isRefreshing}
+                        className="h-7 text-xs"
+                      >
+                        <RefreshCw className={`w-3 h-3 mr-1 ${isRefreshing ? 'animate-spin' : ''}`} />
+                        {isRefreshing ? 'Refreshing...' : 'Refresh'}
+                      </Button>
+                    </div>
+
+                    {/* Usage Niche */}
+                    {usageNiche && (
+                      <div className="bg-muted/30 rounded-lg p-3">
+                        <div className="flex items-start gap-2">
+                          <Users className="w-4 h-4 mt-0.5 text-primary shrink-0" />
+                          <div>
+                            <p className="text-xs font-medium text-muted-foreground mb-1">Primary Use Case</p>
+                            <p className="text-sm">{usageNiche}</p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  )}
+                    )}
 
-                  {/* Community Discussions */}
-                  {communityDiscussions.length > 0 && (
-                    <div>
-                      <div className="flex items-center gap-2 mb-2">
-                        <MessageSquare className="w-4 h-4 text-primary" />
-                        <p className="text-xs font-medium text-muted-foreground">Key Discussion Points</p>
+                    {/* Community Discussions */}
+                    {communityDiscussions.length > 0 && (
+                      <div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <MessageSquare className="w-4 h-4 text-primary" />
+                          <p className="text-xs font-medium text-muted-foreground">Key Discussion Points</p>
+                        </div>
+                        <ul className="space-y-3 ml-6">
+                          {communityDiscussions.map((discussion, index) => {
+                            // Handle both old format (string) and new format (object with sources)
+                            const isObject = typeof discussion === 'object' && discussion !== null;
+                            const point = isObject ? (discussion as CommunityDiscussion).point : discussion;
+                            const sources = isObject ? (discussion as CommunityDiscussion).sources : undefined;
+
+                            return (
+                              <li key={index} className="text-sm list-disc">
+                                <div className="space-y-1">
+                                  <p>{point}</p>
+                                  {sources && sources.length > 0 && (
+                                    <div className="flex flex-wrap gap-2 mt-1">
+                                      {sources.map((source, sourceIndex) => {
+                                        const relativeTime = getRelativeTime(source.published_date);
+                                        return (
+                                          <a
+                                            key={sourceIndex}
+                                            href={source.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                                            onClick={(e) => e.stopPropagation()}
+                                          >
+                                            <LinkIcon className="w-3 h-3" />
+                                            <span>Source {sourceIndex + 1}</span>
+                                            {relativeTime && (
+                                              <span className="text-muted-foreground">({relativeTime})</span>
+                                            )}
+                                          </a>
+                                        );
+                                      })}
+                                    </div>
+                                  )}
+                                </div>
+                              </li>
+                            );
+                          })}
+                        </ul>
                       </div>
-                      <ul className="space-y-3 ml-6">
-                        {communityDiscussions.map((discussion, index) => {
-                          // Handle both old format (string) and new format (object with sources)
-                          const isObject = typeof discussion === 'object' && discussion !== null;
-                          const point = isObject ? (discussion as CommunityDiscussion).point : discussion;
-                          const sources = isObject ? (discussion as CommunityDiscussion).sources : undefined;
+                    )}
 
-                          return (
-                            <li key={index} className="text-sm list-disc">
-                              <div className="space-y-1">
-                                <p>{point}</p>
-                                {sources && sources.length > 0 && (
-                                  <div className="flex flex-wrap gap-2 mt-1">
-                                    {sources.map((source, sourceIndex) => (
-                                      <a
-                                        key={sourceIndex}
-                                        href={source.url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
-                                        onClick={(e) => e.stopPropagation()}
-                                      >
-                                        <LinkIcon className="w-3 h-3" />
-                                        Source {sourceIndex + 1}
-                                      </a>
-                                    ))}
-                                  </div>
-                                )}
-                              </div>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    </div>
-                  )}
-
-                  {/* Analysis timestamp */}
-                  {sentimentAnalyzedAt && (
-                    <p className="text-xs text-muted-foreground italic">
-                      Sentiment analyzed on {new Date(sentimentAnalyzedAt).toLocaleDateString()}
-                    </p>
-                  )}
-                </div>
+                    {/* Analysis timestamp */}
+                    {sentimentAnalyzedAt && (
+                      <p className="text-xs text-muted-foreground italic">
+                        Sentiment analyzed on {new Date(sentimentAnalyzedAt).toLocaleDateString()}
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
             )}
 

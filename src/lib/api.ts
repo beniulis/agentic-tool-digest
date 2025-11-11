@@ -7,6 +7,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 export interface SentimentSource {
   title: string;
   url: string;
+  published_date?: string;  // ISO timestamp when available
 }
 
 export interface CommunityDiscussion {
