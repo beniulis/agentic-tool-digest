@@ -16,7 +16,20 @@ dist-ssr
 .env
 .env.local
 .env.*.local
+.env.development
+.env.production
+.env.test
 backend/.env
+backend/.env.local
+backend/.env.*
+**/secrets/
+**/*.key
+**/*.pem
+**/*.cer
+**/*.crt
+
+# Claude Code settings (may contain sensitive paths/config)
+.claude/settings.local.json
 
 # Python
 __pycache__/
